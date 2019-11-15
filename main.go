@@ -15,7 +15,7 @@ import (
 	."gopkg.in/src-d/go-git.v4/_examples"
 	"time"
 	"sort"
-	
+
 	
 )
 
@@ -29,9 +29,11 @@ func main() {
 	var folder string
 	var email string
 	var logFolder string
+	var push string
 	flag.StringVar(&folder, "add", "", "add a new folder to scan for Git repositories")
 	flag.StringVar(&email, "email", "your@email.com", "the email to scan")
 	flag.StringVar(&logFolder, "log", "", "log all commits")
+	flag.StringVar(&push, "push", "", "<repository path>")
 	flag.Parse()
 
 	if folder != "" {
@@ -40,6 +42,11 @@ func main() {
 	}
 	if logFolder != ""{
 		scanLog(folder)
+		return
+	}
+
+	if push != ""{
+		scanPush(folder)
 		return
 	}
 
@@ -56,6 +63,16 @@ func getDotFilePath() string {
 	dotFile := usr.HomeDir + "/Documents/.gitlocal"
 
 	return dotFile
+}
+
+func scanPush(folder string){
+	repo, err := git.PlainOpen(folder)
+	if err != nil{
+		panic(err)
+	}
+	Info("git push")
+	err = repo.Push(&git.PushOptions{})
+	CheckIfError(err)
 }
 
 // openFile opens the file located at `filePath`. Creates it if not existing.
@@ -233,7 +250,6 @@ func gitlog(path string){
 	cIter, err := repo.Log(&git.LogOptions{From: ref.Hash()})
 	CheckIfError(err)
 
-	// ... just iterates over the commits, printing it
 	err = cIter.ForEach(func(c *object.Commit) error {
 		fmt.Println(c)
 
