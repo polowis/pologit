@@ -12,8 +12,10 @@ import (
 	"io"
 	"io/ioutil"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	."gopkg.in/src-d/go-git.v4/_examples"
 	"time"
 	"sort"
+	
 	
 )
 
@@ -26,12 +28,18 @@ type column []int
 func main() {
 	var folder string
 	var email string
+	var logFolder string
 	flag.StringVar(&folder, "add", "", "add a new folder to scan for Git repositories")
 	flag.StringVar(&email, "email", "your@email.com", "the email to scan")
+	flag.StringVar(&logFolder, "log", "", "log all commits")
 	flag.Parse()
 
 	if folder != "" {
 		scan(folder)
+		return
+	}
+	if logFolder != ""{
+		scanLog(folder)
 		return
 	}
 
@@ -69,6 +77,10 @@ func openFile(filePath string) *os.File {
 	return f
 }
 
+func scanLog(folder string) {
+	fmt.Printf("Found folders:\n\n")
+	gitlog(folder)
+}
 // parseFileLinesToSlice given a file path string, gets the content
 // of each line and parses it to a slice of strings.
 func parseFileLinesToSlice(filePath string) []string {
@@ -205,6 +217,32 @@ func countDaysSinceDate(date time.Time) int {
 
 // fillCommits given a repository found in `path`, gets the commits and
 // puts them in the `commits` map, returning it when completed
+
+func gitlog(path string){
+	repo, err := git.PlainOpen(path)
+	CheckIfError(err)
+	
+	ref, err := repo.Head()
+	CheckIfError(err)
+	Info("git log")
+
+	//since := time.Date(2019, 1, 1, 0, 0, 0, 0, time.UTC)
+	//until := time.Date(2019, 7, 30, 0, 0, 0, 0, time.UTC)
+
+
+	cIter, err := repo.Log(&git.LogOptions{From: ref.Hash()})
+	CheckIfError(err)
+
+	// ... just iterates over the commits, printing it
+	err = cIter.ForEach(func(c *object.Commit) error {
+		fmt.Println(c)
+
+		return nil
+	})
+	CheckIfError(err)
+
+}
+
 func fillCommits(email string, path string, commits map[int]int) map[int]int {
 	// instantiate a git repo object from path
 	repo, err := git.PlainOpen(path)
