@@ -1,6 +1,7 @@
 package main
 //import "github.com/fatih/color"
 import "gopkg.in/src-d/go-git.v4"
+import "github.com/fatih/color"
 import (
 	"fmt"
 	"flag"
@@ -95,7 +96,8 @@ func openFile(filePath string) *os.File {
 }
 
 func scanLog(folder string) {
-	fmt.Printf("Found folders:\n\n")
+	color := color.New(color.FgGreen).Add(color.Underline)
+	color.Printf("Found folders:\n\n")
 	gitlog(folder)
 }
 // parseFileLinesToSlice given a file path string, gets the content
@@ -236,6 +238,7 @@ func countDaysSinceDate(date time.Time) int {
 // puts them in the `commits` map, returning it when completed
 
 func gitlog(path string){
+	color := color.New(color.FgHiYellow, color.Bold)
 	repo, err := git.PlainOpen(path)
 	CheckIfError(err)
 	
@@ -251,7 +254,7 @@ func gitlog(path string){
 	CheckIfError(err)
 
 	err = cIter.ForEach(func(c *object.Commit) error {
-		fmt.Println(c)
+		color.Println(c)
 
 		return nil
 	})
