@@ -31,10 +31,16 @@ func main() {
 	var email string
 	var logFolder string
 	var push string
+	var username string
+	var password string
 	flag.StringVar(&folder, "add", "", "add a new folder to scan for Git repositories")
 	flag.StringVar(&email, "email", "your@email.com", "the email to scan")
 	flag.StringVar(&logFolder, "log", "", "log all commits")
 	flag.StringVar(&push, "push", "", "<repository path>")
+	flag.StringVar(&username, "username", "", "your-username")
+	flag.StringVar(&password, "password", "", "your-username")
+
+
 	flag.Parse()
 
 	if folder != "" {
@@ -53,6 +59,9 @@ func main() {
 
 	stats(email)
 }
+
+
+
 // getDotFilePath returns the dot file for the repos list.
 // Creates it and the enclosing folder if it does not exist.
 func getDotFilePath() string {
